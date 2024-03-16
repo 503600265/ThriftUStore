@@ -1,0 +1,51 @@
+<div class="container mt-5">
+  <!-- Notification -->
+  <% if notice.present? %>
+    <div class="alert alert-success" role="alert" id="notice">
+      <%= notice %>
+    </div>
+  <% end %>
+
+  <!-- Items Header -->
+  <div class="container mt-3">
+    <%= form_with(url: items_path, method: :get, local: true, class: "form-inline") do |form| %>
+      <div class="form-group mb-2">
+        <%= form.label :search, 'Search:', class: 'sr-only' %>
+        <%= form.text_field :search, value: params[:search], placeholder: "Search items", class: 'form-control' %>
+      </div>
+      <%= form.submit 'Search', class: 'btn btn-primary mb-2 ml-2' %>
+      <%= link_to 'Clear Search', items_path(sort: params[:sort], direction: params[:direction]), class: 'btn btn-warning mb-2 ml-2' %>
+    <% end %>
+
+    <div class="buttons mb-4" id="sort_buttons">
+      <% # Define the sort logic for each button %>
+      <% %w[price title owner_rating].each do |field| %>
+        <% direction = params[:sort] == field ? (params[:direction] == 'asc' ? 'desc' : nil) : 'asc' %>
+        <% button_class = params[:sort] == field ? (params[:direction] == 'asc' ? 'btn-primary' : 'btn-secondary') : 'btn-link' %>
+        <%= link_to "Sort by #{field.titleize}", items_path(search: params[:search], sort: direction ? field : nil, direction: direction), class: "btn #{button_class}" %>
+      <% end %>
+    </div>
+  </div>
+
+
+  <!-- Items List -->
+  <div class="row">
+    <% @items.each do |item| %>
+      <div class="col-lg-3 col-md-4 col-sm-6 mb-4 d-flex justify-content-center">
+        <div class="card shadow item-card position-relative">
+          <%= link_to item_path(item), class: 'text-decoration-none stretched-link' do %>
+            <% if item.image.attached? %>
+              <%= image_tag url_for(item.image), class: "card-img-top item-image", alt: item.title %>
+            <% else %>
+              <div class="item-placeholder text-muted">No Image</div>
+            <% end %>
+            <div class="card-body">
+              <h5 class="card-title text-primary"><%= item.title %></h5>
+              <p class="card-text"><strong>Price:</strong> $<%= item.price %></p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
